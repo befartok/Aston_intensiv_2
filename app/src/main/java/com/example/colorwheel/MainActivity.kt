@@ -1,94 +1,129 @@
 package com.example.colorwheel
 
-import androidx.appcompat.app.AppCompatActivity
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
-import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.colorwheel.coreui.views.ColorWheelsView
+import kotlin.random.Random
+import coil.load
 
-class MainActivity : AppCompatActivity(), ColorWheelsView.Listener {
-    //private lateinit var binding: ActivityMainBinding
-    // var textViewz: TextView? = null
-    private var ddd: String = "022"
+class MainActivity : AppCompatActivity() {
 
-    private var number: Int = 5
-
-    private var text: String = "В магазине осталось $number яблок"
-    var textViewz: TextView? = null
-
-    private var tvText: TextView? = null
+    private var textViewPad: TextView? = null
+    private var imageViewPad: ImageView? = null
     private var colorWheelsView: ColorWheelsView? = null
-
+    private var findColor: String = "GREEN"
+    private var numColor: Int = 1
+    private var imgLink: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-//        textViewz = findViewById(R.id.textView)!!
-
         super.onCreate(savedInstanceState)
-        //binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_main)
-        //setContentView(R.layout.activity_main)
-        //binding
 
-        ddd = ColorWheelsView.listener2
-
-        Toast.makeText(this, ddd, Toast.LENGTH_SHORT).show()
-
-        tvText = findViewById(R.id.textView)
+        textViewPad = findViewById(R.id.textViewPad)
+        imageViewPad = findViewById(R.id.imageView)
         colorWheelsView = findViewById(R.id.colorWheelsView)
 
-        tvText?.text = ddd
+        click()
+    }
 
-        //textViewz?.text = ddd
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.run {
+            putString("textViewPadKey", textViewPad?.text.toString())
+            putString("imgLinkKey", imgLink)
+        }
+        super.onSaveInstanceState(outState)
+    }
 
-        oClick()
-
-        rotor()
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        textViewPad?.text = savedInstanceState.getString("textViewPadKey")
+        imgLink = savedInstanceState.getString("imgLinkKey")
+        imageViewPad?.load(imgLink)
 
     }
 
-    fun oClick() {
+    private fun rotor() {
 
-        textViewz?.text = ddd
+        val rotateAngle = (numColor - 1) * 360 / 7 + 360 * 5
 
+        ObjectAnimator.ofFloat(colorWheelsView, View.ROTATION, 0F, rotateAngle.toFloat())
+            .setDuration(1000).start()
+        outputToPad(findColor)
+    }
+
+    private fun outputToPad(textToOut: String) {
+        when (textToOut) {
+
+            "RED", "YELLOW", "CYAN", "MAGENTA" -> {
+                textViewPad?.text = textToOut
+                imageViewPad?.setImageDrawable(null)
+                imgLink = ""
+            }
+
+            "ORANGE", "GREEN", "BLUE" -> showImg()
+        }
+    }
+
+    private fun showImg() {
+        imageViewPad?.load("https://placebeard.it/200")
+        textViewPad?.text = null
+        imgLink = "https://placebeard.it/200"
 
     }
 
-   /* fun clickBtn() {
+    fun onClickList(v: View?) {
 
-        colorWheelsView?.animate()?.apply {
-            rotation(120f)
-            duration = 15000
-            //interpolator = AccelerateDecelerateInterpolator()
+        if (v != null) {
 
-        }?.start()
+            imageViewPad?.setImageDrawable(null)
+            textViewPad?.text = null
 
-
-    }*/
-    fun rotor() {
-
-        colorWheelsView?.animate()?.apply {
-            rotation(5000f)
-            duration = 5000
-            interpolator = AccelerateDecelerateInterpolator()
-
-        }?.start()
-
+        }
 
     }
 
-    /*    fun clickWheels(view: View){
-            Toast.makeText(this, "toast", Toast.LENGTH_SHORT).show()
-            *//*
-                image.makeGone()
-        *//*
+    private fun click() {
 
+        colorWheelsView?.setOnClickListener {
+            getRandomColor()
+            rotor()
+        }
+    }
 
+    private fun getRandomColor() {
+        when (Random.nextInt(from = 1, until = 8)) {
+            4 -> {
+                findColor = "RED"; numColor = 4
+            }
 
-    }*/
+            3 -> {
+                findColor = "ORANGE"; numColor = 3
+            }
 
+            2 -> {
+                findColor = "YELLOW"; numColor = 2
+            }
+
+            1 -> {
+                findColor = "GREEN"; numColor = 1
+            }
+
+            7 -> {
+                findColor = "CYAN"; numColor = 7
+            }
+
+            6 -> {
+                findColor = "BLUE"; numColor = 6
+            }
+
+            5 -> {
+                findColor = "MAGENTA"; numColor = 5
+            }
+        }
+    }
 }
