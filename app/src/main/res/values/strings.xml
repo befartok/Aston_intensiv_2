@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ColorWheel</string>
     <string name="click">click</string>
+    <string name="clearBtn">Reset</string>
 </resources>
